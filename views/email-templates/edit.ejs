@@ -1,0 +1,82 @@
+<div class="page-head">
+    <div>
+        <h1 style="font-size:24px;"><%= template.name %></h1>
+        <p>Sent to sellers when their item is approved. Edit the copy, insert placeholders, and preview live.</p>
+    </div>
+    <span class="badge badge--<%= template.isActive ? 'success' : 'muted' %>"><%= template.isActive ? 'Active' : 'Inactive' %></span>
+</div>
+
+<form method="POST" action="/email-templates/<%= template.id %>" id="tplForm">
+    <input type="hidden" name="_token" value="<%= csrfToken %>">
+    <input type="hidden" name="_method" value="PUT">
+    <div class="two-col">
+        <div class="card">
+            <div class="card__head"><h2>Template</h2><button class="btn btn--primary btn--sm">Save template</button></div>
+            <div class="card__body">
+                <div class="field">
+                    <label>Template name</label>
+                    <input class="input" name="name" value="<%= old.name || template.name %>" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label>From name</label>
+                        <input class="input" name="from_name" value="<%= old.from_name || template.fromName || '' %>">
+                    </div>
+                    <div class="field">
+                        <label>From email</label>
+                        <input class="input" name="from_email" type="email" value="<%= old.from_email || template.fromEmail || '' %>">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Subject line</label>
+                    <input class="input" name="subject" id="f-subject" value="<%= old.subject || template.subject %>" required>
+                </div>
+
+                <div class="field">
+                    <label>Available placeholders <span class="hint" style="display:inline;">— click to copy</span></label>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                        <% Object.entries(placeholders).forEach(([key, desc]) => { %>
+                            <% const token = '{{' + key + '}}'; %>
+                            <span class="chip-key" title="<%= desc %>" onclick="copyChip(this)"><%= token %></span>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Email body (HTML)</label>
+                    <textarea class="textarea" name="body" id="f-body" style="min-height:260px;font-family:ui-monospace,monospace;font-size:12.5px;" required><%= old.body || template.body %></textarea>
+                </div>
+
+                <hr class="divider">
+
+                <div class="field">
+                    <label>SendGrid dynamic template ID <span class="hint" style="display:inline;">(optional)</span></label>
+                    <input class="input mono" name="sendgrid_template_id" value="<%= old.sendgrid_template_id || template.sendgridTemplateId || '' %>" placeholder="d-xxxxxxxxxxxxxxxx">
+                    <div class="hint">Leave blank to send the HTML above via the default mailer. Add this once SendGrid dynamic keys are configured.</div>
+                </div>
+
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;">
+                    <input type="checkbox" name="is_active" value="1" <%= template.isActive ? 'checked' : '' %>> Template is active
+                </label>
+            </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:22px;position:sticky;top:88px;">
+            <div class="card">
+                <div class="card__head">
+                    <h2>Live Preview</h2>
+                    <% if (sample) { %>
+                        <span class="badge badge--teal">data: <%= sample.reference %></span>
+                    <% } %>
+                </div>
+                <div class="card__body">
+                    <div class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;">Subject</div>
+                    <div id="preview-subject" style="font-weight:600;margin:4px 0 16px;"><%= template.subject %></div>
+                    <iframe id="preview-frame" style="width:100%;height:520px;border:1px solid var(--line);border-radius:10px;background:#f6f4f1;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

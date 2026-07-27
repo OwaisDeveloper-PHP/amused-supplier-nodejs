@@ -1,0 +1,79 @@
+<div class="page-head">
+    <div>
+        <h1 style="font-size:24px;"><%= supplier.name %></h1>
+        <p><%= supplier.city %>, <%= supplier.country %>
+            <span class="badge badge--<%= supplier.status === 'active' ? 'success' : 'muted' %>" style="margin-left:8px;"><%= supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1) %></span>
+            <span class="badge badge--teal"><%= (supplier.platform || '').toUpperCase() %></span>
+        </p>
+    </div>
+    <form method="POST" action="/suppliers/<%= supplier.id %>/test-connection">
+        <input type="hidden" name="_token" value="<%= csrfToken %>">
+        <button class="btn btn--dark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 3v13"/><path d="m8 7 4-4 4 4"/><path d="M5 21h14"/></svg>
+            Test API connection
+        </button>
+    </form>
+</div>
+
+<div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat"><div class="stat__accent"></div><div class="stat__label">Products Synced</div><div class="stat__value"><%= Number(supplier.productsSynced).toLocaleString('en-US') %></div><div class="stat__sub">to Amused Shopify</div></div>
+    <div class="stat stat--teal"><div class="stat__accent"></div><div class="stat__label">Linked Entries</div><div class="stat__value"><%= supplier._count.submissions %></div><div class="stat__sub">Sell With Us items</div></div>
+    <div class="stat stat--green"><div class="stat__accent"></div><div class="stat__label">Last Sync</div><div class="stat__value" style="font-size:20px;"><%= supplier.lastSyncedAt ? new Date(supplier.lastSyncedAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—' %></div><div class="stat__sub"></div></div>
+</div>
+
+<div class="two-col">
+    <div style="display:flex;flex-direction:column;gap:22px;">
+        <div class="card">
+            <div class="card__head"><h2>API Integration</h2></div>
+            <div class="card__body">
+                <div class="spec" style="grid-template-columns:1fr;">
+                    <div class="spec__row"><span class="k">Platform</span><span class="v"><%= (supplier.platform || '').toUpperCase() %></span></div>
+                    <div class="spec__row"><span class="k">Base URL</span><span class="v mono"><%= supplier.apiBaseUrl || '—' %></span></div>
+                    <div class="spec__row"><span class="k">Product ingest endpoint</span><span class="v mono"><%= supplier.apiEndpoint || '—' %></span></div>
+                    <div class="spec__row"><span class="k">API key</span><span class="v mono"><%= maskedApiKey || '—' %></span></div>
+                </div>
+                <div class="hint" style="margin-top:12px;">Approved items assigned to this supplier are published to the Amused Shopify store through this endpoint.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__head"><h2>Recent Linked Entries</h2></div>
+            <% if (submissions.length === 0) { %>
+                <div class="empty" style="padding:34px;">No submissions linked to this supplier yet.</div>
+            <% } else { %>
+                <table class="table">
+                    <thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Shopify</th></tr></thead>
+                    <tbody>
+                    <% submissions.forEach(s => { %>
+                        <tr>
+                            <td><a class="ref" href="/submissions/<%= s.id %>"><%= s.reference %></a></td>
+                            <td><%= s.brand %> · <%= s.category %></td>
+                            <td><span class="badge badge--<%= s.status === 'approved' ? 'success' : (s.status === 'rejected' ? 'danger' : 'warning') %>"><%= s.status.charAt(0).toUpperCase() + s.status.slice(1) %></span></td>
+                            <td><%= s.pushedToShopifyAt ? '✓ ' + new Date(s.pushedToShopifyAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '—' %></td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card__head"><h2>Contact</h2></div>
+        <div class="card__body">
+            <div class="spec" style="grid-template-columns:1fr;">
+                <div class="spec__row"><span class="k">Contact person</span><span class="v"><%= supplier.contactName || '—' %></span></div>
+                <div class="spec__row"><span class="k">Phone</span><span class="v"><%= `${supplier.countryCode || ''} ${supplier.phone || ''}`.trim() || '—' %></span></div>
+                <div class="spec__row"><span class="k">Email</span><span class="v"><a href="mailto:<%= supplier.email %>"><%= supplier.email || '—' %></a></span></div>
+                <div class="spec__row"><span class="k">Country</span><span class="v"><%= supplier.country || '—' %></span></div>
+                <div class="spec__row"><span class="k">City</span><span class="v"><%= supplier.city || '—' %></span></div>
+                <div class="spec__row"><span class="k">IBAN</span><span class="v mono"><%= supplier.iban || '—' %></span></div>
+            </div>
+            <% if (supplier.notes) { %>
+                <hr class="divider">
+                <div class="k muted" style="font-size:12px;margin-bottom:6px;">Notes</div>
+                <div><%= supplier.notes %></div>
+            <% } %>
+        </div>
+    </div>
+</div>

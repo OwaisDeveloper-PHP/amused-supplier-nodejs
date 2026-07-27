@@ -1,0 +1,175 @@
+<% const statusLabel = submission.status.charAt(0).toUpperCase() + submission.status.slice(1); %>
+<div class="page-head">
+    <div>
+        <h1 style="font-size:26px;"><%= submission.brand %> <span class="muted" style="font-weight:500;">· <%= submission.category %></span></h1>
+        <p><%= submission.reference %> · submitted <%= new Date(submission.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+            <span class="badge badge--<%= submission.statusColor %>" style="margin-left:8px;"><%= statusLabel %></span>
+        </p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <% if (submission.emailSentAt) { %>
+            <span class="badge badge--teal">✉ Emailed <%= new Date(submission.emailSentAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) %></span>
+        <% } %>
+        <% if (submission.pushedToShopifyAt) { %>
+            <span class="badge badge--success">⤴ On Shopify</span>
+        <% } %>
+    </div>
+</div>
+
+<div class="two-col">
+    <div style="display:flex;flex-direction:column;gap:22px;">
+        <div class="card">
+            <% const mediaLabel = submission.allPhotos.length + ' photos' + (submission.walkthroughVideo ? ', 1 video' : ''); %>
+            <div class="card__head"><h2>Media (<%= mediaLabel %>)</h2></div>
+            <div class="card__body">
+                <% if (submission.walkthroughVideo) { %>
+                    <div style="margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: var(--ink);">
+                        <div style="padding: 10px 14px; background: var(--ink-2); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--ink-3);">
+                            <span style="color: #fff; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                                <svg style="width: 16px; height: 16px; fill: none; stroke: var(--teal-100); stroke-width: 2;" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"/>
+                                </svg>
+                                Walkthrough Video Preview
+                            </span>
+                            <span class="badge badge--teal" style="font-size: 10px; padding: 2px 8px;">walkthrough</span>
+                        </div>
+                        <video controls style="width: 100%; display: block; max-height: 380px; background: #000;" poster="<%= (submission.photos && submission.photos[0] && submission.photos[0].url) || '' %>">
+                            <source src="<%= submission.walkthroughVideo %>" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                <% } %>
+
+                <div class="gallery">
+                    <% if (submission.allPhotos.length === 0) { %>
+                        <div class="muted">No photos attached.</div>
+                    <% } else { %>
+                        <% submission.allPhotos.forEach((photo, idx) => { %>
+                            <a class="gallery__item" href="<%= photo.url %>" data-lightbox-index="<%= idx %>"
+                               onclick="event.preventDefault();openLightbox(<%= idx %>);">
+                                <img src="<%= photo.url %>" alt="<%= photo.name || '' %>"
+                                     onerror="this.style.display='none';this.parentElement.querySelector('.ph').style.display='flex';">
+                                <div class="ph" style="display:none;"><%= photo.name || 'Image' %><br><small>preview expired</small></div>
+                            </a>
+                        <% }) %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__head"><h2>Item Details</h2></div>
+            <div class="card__body">
+                <div class="spec">
+                    <% const specs = [
+                        ['Brand', submission.brand], ['Category', submission.category],
+                        ['Model', submission.model], ['Condition', submission.condition],
+                        ['Colour', submission.colour], ['Size', submission.size],
+                        ['Material', submission.material], ['Year purchased', submission.yearPurchased],
+                        ['Inclusions', submission.inclusions], ['Min. price accepted', 'SAR ' + Number(submission.minimumPrice || 0).toFixed(2)],
+                    ]; %>
+                    <% specs.forEach(([k, v]) => { %>
+                        <div class="spec__row"><span class="k"><%= k %></span><span class="v"><%= v || '—' %></span></div>
+                    <% }) %>
+                </div>
+                <% if (submission.notes) { %>
+                    <hr class="divider">
+                    <div class="k muted" style="font-size:12px;margin-bottom:6px;">Seller notes</div>
+                    <div><%= submission.notes %></div>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__head"><h2>Internal Notes</h2></div>
+            <div class="card__body">
+                <form method="POST" action="/submissions/<%= submission.id %>/notes">
+                    <input type="hidden" name="_token" value="<%= csrfToken %>">
+                    <textarea class="textarea" name="admin_notes" placeholder="Add authentication notes, condition remarks, etc."><%= submission.adminNotes || '' %></textarea>
+                    <div style="margin-top:12px;"><button class="btn btn--ghost btn--sm">Save notes</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:22px;">
+        <div class="card">
+            <div class="card__head"><h2>Workflow</h2></div>
+            <div class="card__body" style="display:flex;flex-direction:column;gap:14px;">
+                <form method="POST" action="/submissions/<%= submission.id %>/approve">
+                    <input type="hidden" name="_token" value="<%= csrfToken %>">
+                    <div class="field" style="margin-bottom:12px;">
+                        <label>Assign supplier (optional)</label>
+                        <select class="select" name="supplier_id">
+                            <option value="">— Unassigned —</option>
+                            <% suppliers.forEach(sup => { %>
+                                <option value="<%= sup.id %>" <%= submission.supplierId === sup.id ? 'selected' : '' %>><%= sup.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <button class="btn btn--primary" style="width:100%;justify-content:center;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg>
+                        <%= submission.isApproved ? 'Update approval' : 'Approve item' %>
+                    </button>
+                </form>
+
+                <form method="POST" action="/submissions/<%= submission.id %>/send-email">
+                    <input type="hidden" name="_token" value="<%= csrfToken %>">
+                    <button class="btn btn--dark" style="width:100%;justify-content:center;" <%= submission.isApproved ? '' : 'disabled' %>>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                        Send notification email
+                    </button>
+                    <% if (!submission.isApproved) { %>
+                        <div class="hint" style="text-align:center;">Approve the item first to notify the seller.</div>
+                    <% } else { %>
+                        <div class="hint" style="text-align:center;">
+                            <%= submission.emailSentAt ? 'Last sent ' + new Date(submission.emailSentAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'Not yet sent' %> ·
+                            <a href="/email-templates/<%= template ? template.id : 1 %>/edit">customise template</a>
+                        </div>
+                    <% } %>
+                </form>
+
+                <% if (submission.isApproved) { %>
+                    <form method="POST" action="/submissions/<%= submission.id %>/push-to-shopify">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
+                        <button class="btn btn--ghost" style="width:100%;justify-content:center;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13m0-13 4 4m-4-4L8 7"/><path d="M5 21h14"/></svg>
+                            <%= submission.pushedToShopifyAt ? 'Re-sync to Shopify' : 'Push to Shopify via supplier API' %>
+                        </button>
+                    </form>
+                <% } %>
+
+                <% if (submission.status !== 'rejected') { %>
+                    <form method="POST" action="/submissions/<%= submission.id %>/reject" data-confirm="Reject <%= submission.reference %>?">
+                        <input type="hidden" name="_token" value="<%= csrfToken %>">
+                        <button class="btn btn--danger" style="width:100%;justify-content:center;">Reject submission</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__head"><h2>Seller</h2></div>
+            <div class="card__body">
+                <div class="spec" style="grid-template-columns:1fr;">
+                    <div class="spec__row"><span class="k">Name</span><span class="v"><%= submission.fullName %></span></div>
+                    <div class="spec__row"><span class="k">Email</span><span class="v"><a href="mailto:<%= submission.email %>"><%= submission.email %></a></span></div>
+                    <div class="spec__row"><span class="k">Phone</span><span class="v"><%= submission.fullPhone %></span></div>
+                    <div class="spec__row"><span class="k">City</span><span class="v"><%= submission.city %></span></div>
+                    <div class="spec__row"><span class="k">IBAN</span><span class="v mono"><%= submission.iban %></span></div>
+                    <div class="spec__row"><span class="k">Referral</span><span class="v"><%= submission.referralSource || '—' %></span></div>
+                </div>
+            </div>
+        </div>
+
+        <% if (submission.supplier) { %>
+            <div class="card">
+                <div class="card__head"><h2>Assigned Supplier</h2></div>
+                <div class="card__body">
+                    <a href="/suppliers/<%= submission.supplier.id %>" style="font-weight:600;"><%= submission.supplier.name %></a>
+                    <div class="muted" style="font-size:12px;margin-top:4px;"><%= submission.supplier.city %>, <%= submission.supplier.country %></div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>

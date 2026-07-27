@@ -1,0 +1,30 @@
+<div class="page-head">
+    <div><p>Partner houses and their product ingest APIs used to publish inventory to the Amused Shopify store.</p></div>
+</div>
+
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr><th>Supplier</th><th>Contact</th><th>Platform</th><th>API Endpoint</th><th>Products</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+        <% suppliers.forEach(sup => { %>
+            <tr>
+                <td>
+                    <a class="ref" href="/suppliers/<%= sup.id %>"><%= sup.name %></a>
+                    <div class="muted" style="font-size:12px;"><%= sup.city %>, <%= sup.country %></div>
+                </td>
+                <td>
+                    <%= sup.contactName || '—' %>
+                    <div class="muted" style="font-size:12px;"><%= `${sup.countryCode || ''} ${sup.phone || ''}`.trim() %></div>
+                </td>
+                <td><span class="badge badge--teal"><%= (sup.platform || '').toUpperCase() %></span></td>
+                <td class="mono" style="max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= sup.apiEndpoint || '—' %></td>
+                <td><b><%= Number(sup.productsSynced).toLocaleString('en-US') %></b></td>
+                <td><span class="badge badge--<%= sup.status === 'active' ? 'success' : 'muted' %>"><%= sup.status.charAt(0).toUpperCase() + sup.status.slice(1) %></span></td>
+                <td style="text-align:right;"><a href="/suppliers/<%= sup.id %>" class="btn btn--ghost btn--sm">Open</a></td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+</div>

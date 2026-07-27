@@ -1,0 +1,21 @@
+<% if (pagination.lastPage > 1) { %>
+<div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;">
+    <%
+        const qs = (p) => {
+            const params = new URLSearchParams();
+            Object.entries(query || {}).forEach(([k, v]) => { if (k !== 'page' && v !== '' && v != null) params.set(k, String(v)); });
+            params.set('page', String(p));
+            return '?' + params.toString();
+        };
+    %>
+    <% if (pagination.currentPage > 1) { %>
+        <a class="btn btn--ghost btn--sm" href="<%= qs(pagination.currentPage - 1) %>">← Prev</a>
+    <% } %>
+    <% pagination.pages.forEach(p => { %>
+        <a class="btn <%= p === pagination.currentPage ? 'btn--primary' : 'btn--ghost' %> btn--sm" href="<%= qs(p) %>"><%= p %></a>
+    <% }) %>
+    <% if (pagination.currentPage < pagination.lastPage) { %>
+        <a class="btn btn--ghost btn--sm" href="<%= qs(pagination.currentPage + 1) %>">Next →</a>
+    <% } %>
+</div>
+<% } %>

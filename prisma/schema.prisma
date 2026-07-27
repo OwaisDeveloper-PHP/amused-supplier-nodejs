@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  rememberToken     String?   @map("remember_token")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Supplier {
+  id             Int       @id @default(autoincrement())
+  name           String
+  contactName    String?   @map("contact_name")
+  email          String?
+  countryCode    String?   @map("country_code")
+  phone          String?
+  country        String?
+  city           String?
+  iban           String?
+  platform       String    @default("shopify")
+  apiBaseUrl     String?   @map("api_base_url")
+  apiEndpoint    String?   @map("api_endpoint")
+  apiKey         String?   @map("api_key")
+  status         String    @default("active")
+  productsSynced Int       @default(0) @map("products_synced")
+  lastSyncedAt   DateTime? @map("last_synced_at")
+  notes          String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  submissions SellWithUsSubmission[]
+
+  @@map("suppliers")
+}
+
+model SellWithUsSubmission {
+  id                Int       @id @default(autoincrement())
+  reference         String    @unique
+  category          String?
+  brand             String?
+  condition         String?
+  inclusions        String?
+  model             String?
+  colour            String?
+  size              String?
+  material          String?
+  yearPurchased     String?   @map("year_purchased")
+  notes             String?
+  minimumPrice      Decimal?  @map("minimum_price") @db.Decimal(12, 2)
+  photos            Json?
+  extraPhotos       Json?     @map("extra_photos")
+  walkthroughVideo  String?   @map("walkthrough_video")
+  firstName         String?   @map("first_name")
+  lastName          String?   @map("last_name")
+  countryCode       String?   @map("country_code")
+  phone             String?
+  email             String?
+  city              String?
+  iban              String?
+  referralSource    String?   @map("referral_source")
+  status            String    @default("pending")
+  supplierId        Int?      @map("supplier_id")
+  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  adminNotes        String?   @map("admin_notes")
+  approvedAt        DateTime? @map("approved_at")
+  rejectedAt        DateTime? @map("rejected_at")
+  emailSentAt       DateTime? @map("email_sent_at")
+  pushedToShopifyAt DateTime? @map("pushed_to_shopify_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("sell_with_us_submissions")
+}
+
+model EmailTemplate {
+  id                 Int      @id @default(autoincrement())
+  key                String   @unique
+  name               String
+  subject            String
+  body               String
+  fromName           String?  @map("from_name")
+  fromEmail          String?  @map("from_email")
+  sendgridTemplateId String?  @map("sendgrid_template_id")
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("email_templates")
+}

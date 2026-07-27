@@ -1,0 +1,94 @@
+<% const isEdit = Boolean(supplier.id); %>
+<div class="page-head">
+    <div><h1 style="font-size:24px;"><%= isEdit ? 'Edit ' + supplier.name : 'Add a supplier' %></h1>
+    <p>Store the partner's contact details and the API endpoint used to publish products to Shopify.</p></div>
+    <a href="<%= isEdit ? '/suppliers/' + supplier.id : '/suppliers' %>" class="btn btn--ghost btn--sm">Cancel</a>
+</div>
+
+<form method="POST" action="<%= isEdit ? '/suppliers/' + supplier.id : '/suppliers' %>">
+    <input type="hidden" name="_token" value="<%= csrfToken %>">
+    <% if (isEdit) { %><input type="hidden" name="_method" value="PUT"><% } %>
+
+    <div class="two-col">
+        <div class="card">
+            <div class="card__head"><h2>Details & Contact</h2></div>
+            <div class="card__body">
+                <div class="field">
+                    <label>Supplier name *</label>
+                    <input class="input" name="name" value="<%= old.name || supplier.name || '' %>" required>
+                </div>
+                <div class="field">
+                    <label>Contact person</label>
+                    <input class="input" name="contact_name" value="<%= old.contact_name || supplier.contactName || '' %>">
+                </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Country code</label>
+                        <input class="input" name="country_code" value="<%= old.country_code || supplier.countryCode || '' %>" placeholder="+966">
+                    </div>
+                    <div class="field">
+                        <label>Phone number</label>
+                        <input class="input" name="phone" value="<%= old.phone || supplier.phone || '' %>">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Email</label>
+                    <input class="input" type="email" name="email" value="<%= old.email || supplier.email || '' %>">
+                </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Country</label>
+                        <input class="input" name="country" value="<%= old.country || supplier.country || '' %>">
+                    </div>
+                    <div class="field">
+                        <label>City</label>
+                        <input class="input" name="city" value="<%= old.city || supplier.city || '' %>">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>IBAN</label>
+                    <input class="input mono" name="iban" value="<%= old.iban || supplier.iban || '' %>">
+                </div>
+                <div class="field">
+                    <label>Notes</label>
+                    <textarea class="textarea" name="notes"><%= old.notes || supplier.notes || '' %></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="align-self:start;">
+            <div class="card__head"><h2>API & Status</h2></div>
+            <div class="card__body">
+                <div class="field">
+                    <label>Platform *</label>
+                    <select class="select" name="platform">
+                        <% const platformOpts = { shopify: 'Shopify', rest: 'REST API', graphql: 'GraphQL' }; %>
+                        <% Object.entries(platformOpts).forEach(([val, lbl]) => { %>
+                            <option value="<%= val %>" <%= (old.platform || supplier.platform) === val ? 'selected' : '' %>><%= lbl %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>API base URL</label>
+                    <input class="input mono" name="api_base_url" value="<%= old.api_base_url || supplier.apiBaseUrl || '' %>" placeholder="https://api.amusedco.com">
+                </div>
+                <div class="field">
+                    <label>Product ingest endpoint</label>
+                    <input class="input mono" name="api_endpoint" value="<%= old.api_endpoint || supplier.apiEndpoint || '' %>" placeholder="/v1/suppliers/…/products.sync">
+                </div>
+                <div class="field">
+                    <label>API key</label>
+                    <input class="input mono" name="api_key" value="<%= old.api_key || supplier.apiKey || '' %>" placeholder="Leave blank to auto-generate">
+                </div>
+                <div class="field">
+                    <label>Status *</label>
+                    <select class="select" name="status">
+                        <option value="active" <%= (old.status || supplier.status) === 'active' ? 'selected' : '' %>>Active</option>
+                        <option value="inactive" <%= (old.status || supplier.status) === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                    </select>
+                </div>
+                <button class="btn btn--primary" style="width:100%;justify-content:center;"><%= isEdit ? 'Save changes' : 'Create supplier' %></button>
+            </div>
+        </div>
+    </div>
+</form>

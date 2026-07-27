@@ -1,0 +1,86 @@
+<div class="stat-grid">
+    <div class="stat">
+        <div class="stat__accent"></div>
+        <div class="stat__label">Total Entries</div>
+        <div class="stat__value"><%= stats.total %></div>
+        <div class="stat__sub">Sell With Us submissions</div>
+    </div>
+    <div class="stat stat--gold">
+        <div class="stat__accent"></div>
+        <div class="stat__label">Pending Review</div>
+        <div class="stat__value"><%= stats.pending %></div>
+        <div class="stat__sub">Awaiting a decision</div>
+    </div>
+    <div class="stat stat--green">
+        <div class="stat__accent"></div>
+        <div class="stat__label">Approved</div>
+        <div class="stat__value"><%= stats.approved %></div>
+        <div class="stat__sub"><%= stats.pushed %> pushed to Shopify</div>
+    </div>
+    <div class="stat stat--teal">
+        <div class="stat__accent"></div>
+        <div class="stat__label">Approved Value</div>
+        <div class="stat__value">
+            <svg class="riyal-symbol-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m20 19.5-5.5 1.2" />
+                <path d="M14.5 4v11.22a1 1 0 0 0 1.242.97L20 15.2" />
+                <path d="m2.978 19.351 5.549-1.363A2 2 0 0 0 10 16V2" />
+                <path d="M20 10 4 13.5" />
+            </svg>
+            <span><%= Number(2000).toLocaleString('en-US') %></span>
+        </div>
+        <div class="stat__sub">Minimum accepted across approved</div>
+    </div>
+</div>
+
+<div class="two-col">
+    <div class="card">
+        <div class="card__head">
+            <h2>Recent Entries</h2>
+            <a href="/submissions" class="btn btn--ghost btn--sm">View all</a>
+        </div>
+        <table class="table">
+            <thead><tr><th>Ref</th><th>Item</th><th>Seller</th><th>Min. Price</th><th>Status</th></tr></thead>
+            <tbody>
+            <% recent.forEach(s => { %>
+                <tr>
+                    <td><a class="ref" href="/submissions/<%= s.id %>"><%= s.reference %></a></td>
+                    <td><b><%= s.brand %></b><div class="muted" style="font-size:12px;"><%= s.category %></div></td>
+                    <td><%= `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Unknown seller' %></td>
+                    <td>SAR <%= Math.round(Number(s.minimumPrice || 0)).toLocaleString('en-US') %></td>
+                    <td><span class="badge badge--<%= s.status === 'approved' ? 'success' : (s.status === 'rejected' ? 'danger' : 'warning') %>"><%= s.status.charAt(0).toUpperCase() + s.status.slice(1) %></span></td>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:22px;">
+        <div class="card">
+            <div class="card__head"><h2>Entries by Brand</h2></div>
+            <div class="card__body" style="display:flex;flex-direction:column;gap:14px;">
+                <% const max = Math.max(...byBrand.map(b => b.total), 1); %>
+                <% byBrand.forEach(b => { %>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+                            <span style="font-weight:600;"><%= b.brand %></span>
+                            <span class="muted"><%= b.total %></span>
+                        </div>
+                        <div style="height:8px;background:#eef1f0;border-radius:999px;overflow:hidden;">
+                            <div style="height:100%;width:<%= Math.round(b.total / max * 100) %>%;background:var(--teal);border-radius:999px;"></div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card__head"><h2>Supplier Network</h2><a href="/suppliers" class="btn btn--ghost btn--sm">Manage</a></div>
+            <div class="card__body" style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;"><span class="muted">Suppliers</span><b><%= stats.suppliers %></b></div>
+                <div style="display:flex;justify-content:space-between;"><span class="muted">Active</span><b><%= stats.activeSuppliers %></b></div>
+                <div style="display:flex;justify-content:space-between;"><span class="muted">Products synced to Shopify</span><b><%= Number(stats.productsSynced).toLocaleString('en-US') %></b></div>
+            </div>
+        </div>
+    </div>
+</div>

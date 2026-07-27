@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in — Amused Supplier Console</title>
+    <link rel="icon" href="/Amused_logo.avif">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="/css/app.css" rel="stylesheet">
+</head>
+<body>
+<div class="login-wrap">
+    <div class="login-brand">
+        <div>
+            <img src="/Amused_logo.avif" alt="Amused">
+        </div>
+        <div>
+            <div class="tag">Luxury Resale · Supplier Operations</div>
+            <h2>The command centre behind every authenticated piece.</h2>
+            <p class="lede">Review "Sell With Us" submissions, approve items, notify sellers, and
+            sync approved inventory to the Amused Shopify store — all from one place.</p>
+        </div>
+        <div style="color:#6d8087;font-size:12px;">© <%= new Date().getFullYear() %> Amused. All rights reserved.</div>
+    </div>
+
+    <div class="login-form">
+        <div class="login-card">
+            <h1>Welcome back</h1>
+            <p class="muted" style="margin-top:0;">Sign in to the supplier console.</p>
+
+            <% if (errors && errors.length) { %>
+                <div class="flash flash--err" style="margin-top:18px;"><%= errors[0] %></div>
+            <% } %>
+
+            <form method="POST" action="/login" style="margin-top:22px;">
+                <input type="hidden" name="_token" value="<%= csrfToken %>">
+                <div class="field">
+                    <label>Email address</label>
+                    <input class="input" type="email" name="email" value="<%= old.email || 'admin@amusedco.com' %>" required autofocus>
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input class="input" type="password" name="password" value="password" required>
+                </div>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:20px;">
+                    <input type="checkbox" name="remember"> Keep me signed in
+                </label>
+                <button class="btn btn--primary" style="width:100%;justify-content:center;padding:12px;">Sign in</button>
+            </form>
+
+            <div class="demo-note">
+                <b style="color:var(--ink);">Demo access</b><br>
+                admin@amusedco.com · password
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

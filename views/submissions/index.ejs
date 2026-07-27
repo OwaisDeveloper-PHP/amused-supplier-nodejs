@@ -1,0 +1,80 @@
+<div class="page-head">
+    <div>
+        <p><%= pagination.total %> submissions from sellers via the "Sell With Us" form.</p>
+    </div>
+</div>
+
+<form method="GET" class="toolbar">
+    <input class="input grow" type="text" name="q" value="<%= query.q || '' %>" placeholder="Search reference, seller, e-mail or model…">
+    <select class="select" name="status" onchange="this.form.submit()">
+        <option value="">All statuses</option>
+        <% [['pending','Pending'],['approved','Approved'],['rejected','Rejected']].forEach(([val, lbl]) => { %>
+            <option value="<%= val %>" <%= query.status === val ? 'selected' : '' %>><%= lbl %></option>
+        <% }) %>
+    </select>
+    <select class="select" name="brand" onchange="this.form.submit()">
+        <option value="">All brands</option>
+        <% brands.forEach(b => { %>
+            <option value="<%= b %>" <%= query.brand === b ? 'selected' : '' %>><%= b %></option>
+        <% }) %>
+    </select>
+    <button class="btn btn--primary">Search</button>
+    <% if (query.q || query.status || query.brand) { %>
+        <a href="/submissions" class="btn btn--ghost">Reset</a>
+    <% } %>
+</form>
+
+<% if (submissions.length === 0) { %>
+    <div class="card"><div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <div>No submissions match your filters.</div>
+    </div></div>
+<% } else { %>
+    <div class="grid-cards">
+        <% submissions.forEach(s => { %>
+            <% const cover = (s.photos || [])[0]; const count = s.allPhotos.length + (s.walkthroughVideo ? 1 : 0); %>
+            <div class="sub-card">
+                <div class="sub-card__media">
+                    <span class="sub-card__badge badge badge--<%= s.statusColor %>"><%= s.status.charAt(0).toUpperCase() + s.status.slice(1) %></span>
+                    <% if (cover) { %>
+                        <img src="<%= cover.url %>" alt="<%= s.brand %>"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                        <div class="placeholder" style="display:none;"><%= cover.name || 'Image' %><br><small>preview unavailable</small></div>
+                    <% } else { %>
+                        <div class="placeholder">No photo</div>
+                    <% } %>
+                    <span class="sub-card__count"><%= count %> media</span>
+                </div>
+                <div class="sub-card__body">
+                    <div class="sub-card__brand"><%= s.brand || '—' %></div>
+                    <div class="sub-card__cat"><%= s.category %> · <%= s.condition %></div>
+                    <div class="sub-card__meta">
+                        <span class="sub-card__price">SAR <%= Math.round(Number(s.minimumPrice || 0)).toLocaleString('en-US') %></span>
+                        <span class="sub-card__ref"><%= s.reference %></span>
+                    </div>
+                    <div class="muted" style="font-size:12px;margin-top:10px;">
+                        <%= s.fullName %> · <%= s.city %>
+                        <% if (s.emailSentAt) { %> · <span style="color:var(--teal-600);">✉ notified</span><% } %>
+                        <% if (s.pushedToShopifyAt) { %> · <span style="color:var(--success);">⤴ on Shopify</span><% } %>
+                    </div>
+                </div>
+                <div class="sub-card__foot">
+                    <a href="/submissions/<%= s.id %>" class="btn btn--ghost btn--sm">View</a>
+                    <% if (s.status !== 'approved') { %>
+                        <form method="POST" action="/submissions/<%= s.id %>/approve" style="flex:1;">
+                            <input type="hidden" name="_token" value="<%= csrfToken %>">
+                            <button class="btn btn--primary btn--sm" style="width:100%;justify-content:center;">Approve item</button>
+                        </form>
+                    <% } else { %>
+                        <form method="POST" action="/submissions/<%= s.id %>/send-email" style="flex:1;">
+                            <input type="hidden" name="_token" value="<%= csrfToken %>">
+                            <button class="btn btn--dark btn--sm" style="width:100%;justify-content:center;">Send email</button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <div style="margin-top:26px;"><%- include('../partials/pagination', { pagination, query }) %></div>
+<% } %>
