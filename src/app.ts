@@ -1,5 +1,6 @@
 import path from 'path';
 import express from 'express';
+import cors from 'cors';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import methodOverride from 'method-override';
@@ -10,6 +11,8 @@ import { flashLocals } from './middleware/flash';
 import { router } from './routes';
 
 const PgSession = connectPgSimple(session);
+
+const ALLOWED_API_ORIGINS = ['https://amusedco.com', 'https://admin.shopify.com'];
 
 export function createApp() {
   const app = express();
@@ -41,6 +44,14 @@ export function createApp() {
     res.locals.request = { query: req.query, path: req.path };
     next();
   });
+
+  app.use(
+    '/api',
+    cors({
+      origin: ALLOWED_API_ORIGINS,
+      credentials: true,
+    })
+  );
 
   // Public JSON API endpoints (e.g. the storefront Sell With Us form) are stateless and
   // authenticated by their own means, so they don't carry a session CSRF token.
