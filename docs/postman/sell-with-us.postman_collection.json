@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Sell With Us API",
+    "description": "Public submission endpoint for the storefront Sell With Us form (POST /api/sell-with-us).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "Submit — full payload (JSON)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"form_type\": \"contact\",\n  \"utf8\": \"\\u2713\",\n  \"contact[Selected_Category]\": \"Bags & Small Leather Goods\",\n  \"contact[Selected_Brand]\": \"Dior\",\n  \"contact[Item_Condition]\": \"Brand New\",\n  \"contact[Item_Inclusions]\": \"Authenticity Card\",\n  \"contact[Item_Model]\": \"Classic Flap, Neverfull MM, Birkin 30, Submariner\",\n  \"contact[Item_Colour]\": \"Black\",\n  \"contact[Item_Size]\": \"Large\",\n  \"contact[Item_Material]\": \"Material\",\n  \"contact[Year_Purchased]\": \"2025\",\n  \"contact[Item_Notes]\": \"Describe anything else — wear, alterations, or special features\\n\",\n  \"contact[Photo_Front_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013053/blob_trr8dn.jpg\",\n  \"contact[Photo_Back_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013049/blob_efxqfg.jpg\",\n  \"contact[Photo_Sides_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013061/blob_x6wjos.jpg\",\n  \"contact[Photo_Hardware_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013068/blob_skfcmz.jpg\",\n  \"contact[Photo_Interior_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013073/blob_sfqv0m.jpg\",\n  \"contact[Photo_Serial_Code_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013079/blob_djal1w.jpg\",\n  \"contact[Photo_Inclusions_URL]\": \"\",\n  \"contact[Photo_Wear_Marks_URL]\": \"https://res.cloudinary.com/ltvb2kjr/image/upload/v1784013088/blob_jctfi2.jpg\",\n  \"contact[Photo_Extra_URL]\": \"\",\n  \"contact[Photo_Strap_URL]\": \"\",\n  \"contact[Walkthrough_Video_URL]\": \"\",\n  \"contact[Minimum_Price_Accepted]\": \"4587120\",\n  \"contact[First_Name]\": \"Owais\",\n  \"contact[Last_Name]\": \"Hassan\",\n  \"contact[Country_Code]\": \"+966\",\n  \"contact[Phone_Number]\": \"5545789\",\n  \"contact[email]\": \"owais.hassan@nextgeni.com\",\n  \"contact[City]\": \"Dammam / Khobar\",\n  \"contact[IBAN]\": \"PK40MEZN0000001123456702\",\n  \"contact[Referral_Source]\": \"Friend / Referral\",\n  \"h-captcha-response\": \"\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sell-with-us",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sell-with-us"]
+        }
+      }
+    },
+    {
+      "name": "Submit — form-urlencoded",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "form_type", "value": "contact" },
+            { "key": "contact[Selected_Category]", "value": "Watches" },
+            { "key": "contact[Selected_Brand]", "value": "Rolex" },
+            { "key": "contact[Item_Condition]", "value": "Very good" },
+            { "key": "contact[First_Name]", "value": "Jane" },
+            { "key": "contact[Last_Name]", "value": "Doe" },
+            { "key": "contact[email]", "value": "jane@example.com" },
+            { "key": "contact[Phone_Number]", "value": "5551234" },
+            { "key": "contact[Minimum_Price_Accepted]", "value": "6800" }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sell-with-us",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sell-with-us"]
+        }
+      }
+    },
+    {
+      "name": "Submit — missing required fields (expect 422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"form_type\": \"contact\",\n  \"contact[Selected_Category]\": \"Watches\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/sell-with-us",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "sell-with-us"]
+        }
+      }
+    }
+  ]
+}

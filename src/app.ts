@@ -42,7 +42,9 @@ export function createApp() {
     next();
   });
 
-  app.use(verifyCsrf);
+  // Public JSON API endpoints (e.g. the storefront Sell With Us form) are stateless and
+  // authenticated by their own means, so they don't carry a session CSRF token.
+  app.use((req, res, next) => (req.path.startsWith('/api/') ? next() : verifyCsrf(req, res, next)));
   app.use('/', router);
 
   return app;

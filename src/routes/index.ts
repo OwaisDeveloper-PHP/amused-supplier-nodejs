@@ -5,12 +5,16 @@ import * as dashboardController from '../controllers/dashboardController';
 import * as submissionController from '../controllers/submissionController';
 import * as supplierController from '../controllers/supplierController';
 import * as emailTemplateController from '../controllers/emailTemplateController';
+import * as sellWithUsApiController from '../controllers/api/sellWithUsController';
 
 export const router = Router();
 
 router.get('/login', authController.showLogin);
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
+
+// Public API — consumed by the storefront "Sell With Us" form, no session/auth required.
+router.post('/api/sell-with-us', sellWithUsApiController.submit);
 
 router.use(requireAuth);
 
