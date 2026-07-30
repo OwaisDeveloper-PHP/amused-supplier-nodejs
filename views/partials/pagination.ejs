@@ -1,4 +1,4 @@
-<% if (pagination.lastPage > 1) { %>
+<% if (pagination.total > 9 && pagination.lastPage > 1) { %>
 <div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;">
     <%
         const qs = (p) => {

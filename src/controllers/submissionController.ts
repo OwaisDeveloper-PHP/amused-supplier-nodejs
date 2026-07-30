@@ -22,7 +22,7 @@ function decorate<T extends { firstName: string | null; lastName: string | null;
   };
 }
 
-const PER_PAGE = 12;
+const PER_PAGE = 9;
 
 export async function index(req: Request, res: Response) {
   const status = typeof req.query.status === 'string' ? req.query.status : '';
