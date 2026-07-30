@@ -178,34 +178,70 @@ async function seedSubmissions() {
   const rolex = await prisma.supplier.findFirst({ where: { name: { contains: 'Rolex' } } });
   const chanel = await prisma.supplier.findFirst({ where: { name: { contains: 'Chanel' } } });
 
-  const brands = ['Dior', 'Rolex', 'Chanel', 'Gucci'];
-  let i = 0;
+  const brands = ['Dior', 'Rolex', 'Chanel', 'Gucci', 'Hermès', 'Prada', 'Saint Laurent', 'Cartier'];
+  const categories: Record<string, string> = {
+    Dior: 'Bags & Small Leather Goods',
+    Rolex: 'Watches',
+    Chanel: 'Bags & Small Leather Goods',
+    Gucci: 'Bags & Accessories',
+    Hermès: 'Bags & Leather Goods',
+    Prada: 'Handbags & Accessories',
+    'Saint Laurent': 'Bags',
+    Cartier: 'Jewelry & Watches',
+  };
+  const models: Record<string, string[]> = {
+    Dior: ['Lady Dior', 'Saddle Bag', '30 Montaigne'],
+    Rolex: ['Submariner', 'Datejust', 'Daytona'],
+    Chanel: ['Classic Flap', '2.55 Reissue', 'Boy Bag'],
+    Gucci: ['GG Marmont', 'Dionysus', 'Jackie 1961'],
+    Hermès: ['Birkin 30', 'Kelly 28', 'Constance 24'],
+    Prada: ['Galleria', 'Cleo', 'Re-Edition 2005'],
+    'Saint Laurent': ['Loulou', 'Kate', 'Solferino'],
+    Cartier: ['Love Bracelet', 'Tank Must', 'Santos de Cartier'],
+  };
+  const minPrices: Record<string, number[]> = {
+    Dior: [3500, 4200, 3800],
+    Rolex: [6800, 7500, 12500],
+    Chanel: [5200, 5600, 4800],
+    Gucci: [1500, 1900, 2100],
+    Hermès: [18500, 22000, 14000],
+    Prada: [1800, 2400, 1600],
+    'Saint Laurent': [2800, 3100, 2600],
+    Cartier: [4500, 6200, 8900],
+  };
 
+  let count = 0;
   for (const brand of brands) {
-    const details = brandDetails[brand];
-    for (let j = 0; j < 2; j++) {
-      i++;
-      const seller = sellers[(i - 1) % sellers.length];
-      const images = sampleImages[brand];
-      const reference = `SWU-${String(i).padStart(4, '0')}`;
+    const brandModels = models[brand] || ['Standard'];
+    const brandPrices = minPrices[brand] || [2000];
+    const category = categories[brand] || 'Accessories';
+    const images = sampleImages[brand] || sampleImages['Gucci'];
+
+    for (let j = 0; j < 3; j++) {
+      count++;
+      const seller = sellers[(count - 1) % sellers.length];
+      const reference = `SWU-${String(count).padStart(4, '0')}`;
 
       const existing = await prisma.sellWithUsSubmission.findUnique({ where: { reference } });
       if (existing) continue;
 
+      const statuses = ['pending', 'approved', 'rejected', 'pending'];
+      const status = statuses[count % statuses.length];
+
       await prisma.sellWithUsSubmission.create({
         data: {
           reference,
-          category: details.category,
+          category,
           brand,
-          condition: j === 0 ? 'Excellent' : 'Very good',
+          condition: j === 0 ? 'Excellent' : j === 1 ? 'Very good' : 'Good',
           inclusions: 'Original box, dust bag, authenticity card',
-          model: details.models[j],
-          colour: j === 0 ? 'Black' : 'Beige',
-          size: brand === 'Rolex' ? '40mm' : 'Medium',
+          model: brandModels[j % brandModels.length],
+          colour: j === 0 ? 'Black' : j === 1 ? 'Beige' : 'Gold',
+          size: brand === 'Rolex' || brand === 'Cartier' ? '40mm' : 'Medium',
           material: brand === 'Rolex' ? 'Stainless steel' : 'Calfskin leather',
-          yearPurchased: String(2019 + j),
+          yearPurchased: String(2019 + (j % 4)),
           notes: 'Well maintained, stored in original packaging.',
-          minimumPrice: details.minPrices[j],
+          minimumPrice: brandPrices[j % brandPrices.length],
           photos: images.slice(0, 3),
           extraPhotos: images.slice(3),
           walkthroughVideo:
@@ -220,7 +256,7 @@ async function seedSubmissions() {
           city: seller.city,
           iban: iban(),
           referralSource: j === 0 ? 'Instagram' : 'Referral',
-          status: 'pending',
+          status,
         },
       });
     }
