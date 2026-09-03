@@ -37,22 +37,17 @@
                 <input type="hidden" name="_token" value="<%= csrfToken %>">
                 <div class="field">
                     <label>Email address</label>
-                    <input class="input" type="email" name="email" value="<%= old.email || 'admin@amusedco.com' %>" required autofocus>
+                    <input class="input" type="email" name="email" value="<%= old.email || '' %>" required autofocus autocomplete="off">
                 </div>
                 <div class="field">
                     <label>Password</label>
-                    <input class="input" type="password" name="password" value="password" required>
+                    <input class="input" type="password" name="password" value="" required autocomplete="off">
                 </div>
                 <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-bottom:20px;">
                     <input type="checkbox" name="remember"> Keep me signed in
                 </label>
                 <button class="btn btn--primary" style="width:100%;justify-content:center;padding:12px;">Sign in</button>
             </form>
-
-            <div class="demo-note">
-                <b style="color:var(--ink);">Demo access</b><br>
-                admin@amusedco.com · password
-            </div>
         </div>
     </div>
 </div>
