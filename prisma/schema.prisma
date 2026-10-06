@@ -58,11 +58,16 @@ model SellWithUsSubmission {
   size              String?
   material          String?
   yearPurchased     String?   @map("year_purchased")
+  wherePurchased    String?   @map("where_purchased")
   notes             String?
   minimumPrice      Decimal?  @map("minimum_price") @db.Decimal(12, 2)
   photos            Json?
   extraPhotos       Json?     @map("extra_photos")
   walkthroughVideo  String?   @map("walkthrough_video")
+  visibleWear       Json?     @map("visible_wear")
+  repairs           String?
+  preference        String?
+  additionalInfo    String?   @map("additional_info")
   firstName         String?   @map("first_name")
   lastName          String?   @map("last_name")
   countryCode       String?   @map("country_code")

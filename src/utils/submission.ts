@@ -15,6 +15,10 @@ export function allPhotos(s: { photos: unknown; extraPhotos: unknown }): Photo[]
   return [...photos, ...extra];
 }
 
+export function visibleWearList(s: { visibleWear: unknown }): string[] {
+  return Array.isArray(s.visibleWear) ? (s.visibleWear as string[]) : [];
+}
+
 export function isApproved(s: { status: string }): boolean {
   return s.status === 'approved';
 }

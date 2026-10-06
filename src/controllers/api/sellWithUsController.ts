@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../db';
 import { extractContactPayload } from '../../utils/contactPayload';
 
@@ -23,6 +24,16 @@ function buildPhotos(contact: Record<string, string>, fields: { key: string; lab
   return fields
     .filter((field) => contact[field.key]?.trim())
     .map((field) => ({ url: contact[field.key].trim(), name: field.label }));
+}
+
+/** Splits a comma-separated multi-select field (e.g. "Scratches, Stains, Odour") into a clean string array. */
+function splitMultiValue(raw: string | undefined): string[] | typeof Prisma.JsonNull {
+  if (!raw?.trim()) return Prisma.JsonNull;
+  const values = raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+  return values.length > 0 ? values : Prisma.JsonNull;
 }
 
 function generateReference(): string {
@@ -83,11 +94,16 @@ export async function submit(req: Request, res: Response) {
     size: contact.Item_Size || null,
     material: contact.Item_Material || null,
     yearPurchased: contact.Year_Purchased || null,
+    wherePurchased: contact.Where_Purchased || null,
     notes: contact.Item_Notes || null,
     minimumPrice,
     photos: buildPhotos(contact, PHOTO_FIELDS),
     extraPhotos: buildPhotos(contact, EXTRA_PHOTO_FIELDS),
     walkthroughVideo: contact.Walkthrough_Video_URL || null,
+    visibleWear: splitMultiValue(contact.Visible_Wear),
+    repairs: contact.Repairs || null,
+    preference: contact.Preference || null,
+    additionalInfo: contact.Additional || null,
     firstName: contact.First_Name || null,
     lastName: contact.Last_Name || null,
     countryCode: contact.Country_Code || null,
