@@ -7,7 +7,7 @@ import { sendMail, mailDriverLabel } from '../services/mailer';
 import { paginationMeta } from '../utils/pagination';
 import { renderToHtml } from '../utils/renderView';
 import { renderPage } from '../utils/renderPage';
-import { allPhotos, fullName, fullPhone, isApproved, statusColor, visibleWearList } from '../utils/submission';
+import { allPhotos, fullName, fullPhone, isApproved, statusColor, visibleWearList, whatsappNumber } from '../utils/submission';
 
 function decorate<T extends { firstName: string | null; lastName: string | null; countryCode: string | null; phone: string | null; photos: unknown; extraPhotos: unknown; visibleWear: unknown; status: string }>(
   s: T
@@ -16,6 +16,7 @@ function decorate<T extends { firstName: string | null; lastName: string | null;
     ...s,
     fullName: fullName(s),
     fullPhone: fullPhone(s),
+    whatsappNumber: whatsappNumber(s),
     allPhotos: allPhotos(s),
     visibleWearList: visibleWearList(s),
     isApproved: isApproved(s),

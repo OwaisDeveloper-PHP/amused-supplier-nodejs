@@ -9,6 +9,12 @@ export function fullPhone(s: { countryCode: string | null; phone: string | null 
   return `${s.countryCode ?? ''} ${s.phone ?? ''}`.trim();
 }
 
+/** Digits-only phone number (E.164-ish, no "+" or spaces) suitable for a wa.me WhatsApp link, or null if no phone is on file. */
+export function whatsappNumber(s: { countryCode: string | null; phone: string | null }): string | null {
+  const digits = fullPhone(s).replace(/[^0-9]/g, '');
+  return digits || null;
+}
+
 export function allPhotos(s: { photos: unknown; extraPhotos: unknown }): Photo[] {
   const photos = Array.isArray(s.photos) ? (s.photos as Photo[]) : [];
   const extra = Array.isArray(s.extraPhotos) ? (s.extraPhotos as Photo[]) : [];

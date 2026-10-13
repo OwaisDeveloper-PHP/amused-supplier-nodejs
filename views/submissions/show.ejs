@@ -171,7 +171,16 @@
                 <div class="spec" style="grid-template-columns:1fr;">
                     <div class="spec__row"><span class="k">Name</span><span class="v"><%= submission.fullName %></span></div>
                     <div class="spec__row"><span class="k">Email</span><span class="v"><a href="mailto:<%= submission.email %>"><%= submission.email %></a></span></div>
-                    <div class="spec__row"><span class="k">Phone</span><span class="v"><%= submission.fullPhone %></span></div>
+                    <div class="spec__row"><span class="k">Phone</span><span class="v">
+                        <% if (submission.whatsappNumber) { %>
+                            <a href="https://wa.me/<%= submission.whatsappNumber %>" target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp">
+                                <%= submission.fullPhone %>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-left:4px;"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.8 14.17c-.24.68-1.39 1.3-1.92 1.38-.49.08-1.11.11-1.79-.11-.41-.13-.94-.3-1.62-.59-2.84-1.23-4.7-4.1-4.84-4.29-.14-.19-1.15-1.53-1.15-2.92s.72-2.07.98-2.35c.25-.28.55-.35.73-.35.19 0 .37.002.53.009.17.008.4-.064.62.475.24.57.81 1.98.88 2.12.07.15.12.32.02.51-.1.19-.15.31-.29.48-.15.17-.31.37-.44.5-.15.15-.3.31-.13.6.17.3.77 1.26 1.65 2.04 1.13 1.01 2.09 1.33 2.38 1.48.3.15.47.13.64-.07.17-.21.73-.85.92-1.14.19-.3.38-.24.63-.15.26.1 1.64.77 1.92.91.28.14.47.21.54.33.07.11.07.65-.17 1.33z"/></svg>
+                            </a>
+                        <% } else { %>
+                            <%= submission.fullPhone || '—' %>
+                        <% } %>
+                    </span></div>
                     <div class="spec__row"><span class="k">City</span><span class="v"><%= submission.city %></span></div>
                     <div class="spec__row"><span class="k">IBAN</span><span class="v mono"><%= submission.iban %></span></div>
                     <div class="spec__row"><span class="k">Referral</span><span class="v"><%= submission.referralSource || '—' %></span></div>
